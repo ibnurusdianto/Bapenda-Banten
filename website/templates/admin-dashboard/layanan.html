@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container mt-5">
+    <h2>List Layanan</h2>
+    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createLayananModal">Tambah Layanan</button>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Nama Layanan</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for layanan in layanan %}
+            <tr>
+                <td>{{ layanan.nama_layanan }}</td>
+                <td>
+                    <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editLayananModal{{ layanan.id }}">Edit</button>
+                    <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteLayananModal{{ layanan.id }}">Delete</button>
+                </td>
+            </tr>
+            <!-- Edit Modal -->
+            <div class="modal fade" id="editLayananModal{{ layanan.id }}" tabindex="-1" aria-labelledby="editLayananModalLabel{{ layanan.id }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editLayananModalLabel{{ layanan.id }}">Edit Layanan</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="post" action="{% url 'layanan_update' layanan.id %}">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label for="nama_layanan" class="form-label">Nama Layanan</label>
+                                    <input type="text" class="form-control" id="nama_layanan" name="nama_layanan" value="{{ layanan.nama_layanan }}" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Simpan</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Delete Modal -->
+            <div class="modal fade" id="deleteLayananModal{{ layanan.id }}" tabindex="-1" aria-labelledby="deleteLayananModalLabel{{ layanan.id }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteLayananModalLabel{{ layanan.id }}">Konfirmasi Hapus Layanan</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Apakah Anda yakin ingin menghapus layanan "{{ layanan.nama_layanan }}"?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <form method="post" action="{% url 'layanan_delete' layanan.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Ya, hapus</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Create Modal -->
+<div class="modal fade" id="createLayananModal" tabindex="-1" aria-labelledby="createLayananModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createLayananModalLabel">Tambah Layanan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{% url 'layanan_create' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="nama_layanan" class="form-label">Nama Layanan</label>
+                        <input type="text" class="form-control" id="nama_layanan" name="nama_layanan" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

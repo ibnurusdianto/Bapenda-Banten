@@ -1,0 +1,61 @@
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BPD</title>
+
+  <link rel="stylesheet" href="{% static 'user/css/style.css' %}">
+
+</head>
+
+<body>
+
+  <div class="header">
+    <nav class="nav-bar">
+      <div class="logo">
+        <img src="{% static 'user/img/logo-banten.png' %}" alt="">
+        <h3 class="logo-text">BADAN PENDAPATAN DAERAH</h3>
+      </div>
+
+      <div class="header-left">
+        <h3>
+          <span>Optimal Pendapatan</span>
+          <span>Maksimal Pelayanan</span>
+        </h3>
+      </div>
+    </nav>
+
+    <hr class="hr">
+
+    <div class="content">
+      <video class="video" controls>
+        <source src="video/video.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+
+      <aside class="aside">
+        <img src="img/icon.png" alt="">
+        <p>Klik tombol dibawah untuk isi kuesioner pelayanan kami</p>
+        <a href="{% url 'isi_kusioner' %}" class="btn">Isi Kuesioner</a>
+        <a href="{% url 'logout' %}" class="btn">Logout</a>
+      </aside>
+    </div>
+
+    <div class="banner">
+      <div class="marquee">
+        <span>Selamat Datang di Bapenda Provinsi Banten, Silahkan Tekan Tombol Isi Kuesioner di atas untuk mengisi
+          Survey</span>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+
+</html>
+
+{% endblock %}

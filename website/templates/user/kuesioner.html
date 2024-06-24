@@ -1,0 +1,185 @@
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BPD</title>
+  <link rel="stylesheet" href="{% static 'user/css/style.css' %}">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+  <div class="header">
+    <nav class="nav-bar">
+      <div class="logo">
+        <img src="{% static 'user/img/logo-banten.png' %}" alt="Logo Banten">
+        <h3 class="logo-text">BADAN PENDAPATAN DAERAH</h3>
+      </div>
+      <div class="header-left">
+        <h3>
+          <span>Optimal Pendapatan</span>
+          <span>Maksimal Pelayanan</span>
+        </h3>
+      </div>
+    </nav>
+    <hr class="hr">
+
+    <!-- kuesioner.html -->
+    <div class="survey-container">
+        <form id="surveyForm" method="POST" action="{% url 'isi_kusioner' %}">
+            {% csrf_token %}
+            <div>
+                <label for="jenis_layanan">Jenis Layanan:</label>
+                <select id="jenis_layanan" name="jenis_layanan" onchange="filterQuestions()">
+                    <option value="">Pilih Jenis Layanan</option>
+                    {% for layanan in jenis_layanan %}
+                    <option value="{{ layanan.id }}">{{ layanan.nama_layanan }}</option>
+                    {% endfor %}
+              </select>
+            </div>
+            <!-- Pertanyaan kuesioner -->
+            {% for pertanyaan in daftar_pertanyaan %}
+            <div class="card-survey question" data-layanan="{{ pertanyaan.layanan.id }}" id="question{{ forloop.counter }}" style="display: none;">
+                <h2>{{ forloop.counter }}. {{ pertanyaan.isi_pertanyaan }}</h2>
+                <div class="rating">
+                    <ul>
+                        <label>
+                            <input type="radio" id="opsi_a_{{ forloop.counter }}" value="{{ pertanyaan.opsi_a }}" name="rating_{{ pertanyaan.id }}">
+                            <span class="icon" style="font-size: 20px;">★</span>
+                            <span class="text" style="font-size: 20px; margin-left: 10px;">{{ pertanyaan.opsi_a }}</span>
+                        </label>
+                    </ul>
+                    <ul>
+                        <label>
+                            <input type="radio" id="opsi_b_{{ forloop.counter }}" value="{{ pertanyaan.opsi_b }}" name="rating_{{ pertanyaan.id }}">
+                            <span class="icon" style="font-size: 20px;">★</span>
+                            <span class="icon" style="font-size: 20px;">★</span>
+                            <span class="text" style="font-size: 20px; margin-left: 10px;">{{ pertanyaan.opsi_b }}</span>
+                        </label>
+                    </ul>
+                    <ul>
+                        <label>
+                            <input type="radio" id="opsi_c_{{ forloop.counter }}" value="{{ pertanyaan.opsi_c }}" name="rating_{{ pertanyaan.id }}">
+                            <span class="icon" style="font-size: 20px;">★</span>
+                            <span class="icon" style="font-size: 20px;">★</span>
+                            <span class="icon" style="font-size: 20px;">★</span>
+                            <span class="text" style="font-size: 20px; margin-left: 10px;">{{ pertanyaan.opsi_c }}</span>
+                        </label>
+                    </ul>
+                    <ul>
+                        <label>
+                            <input type="radio" id="opsi_d_{{ forloop.counter }}" value="{{ pertanyaan.opsi_d }}" name="rating_{{ pertanyaan.id }}">
+                            <span class="icon" style="font-size: 20px;">★</span>
+                            <span class="icon" style="font-size: 20px;">★</span>
+                            <span class="icon" style="font-size: 20px;">★</span>
+                            <span class="icon" style="font-size: 20px;">★</span>
+                            <span class="text" style="font-size: 20px; margin-left: 10px;">{{ pertanyaan.opsi_d }}</span>
+                        </label>
+                    </ul>
+                </div>
+                <div class="navigation-button">
+                    {% if not forloop.first %}
+                    <a href="#" class="previous" onclick="previousQuestion('question{{ forloop.counter }}', event)">Previous</a>
+                    {% endif %}
+                    {% if not forloop.last %}
+                    <a href="#" class="next" onclick="nextQuestion('question{{ forloop.counter }}', event)">Next</a>
+                    {% endif %}
+                    {% if forloop.last %}
+                    <button type="submit" class="submit">Submit</button>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </form>
+    </div>
+  </div>
+
+  <!-- Modal 1: Confirm Submit -->
+  <div class="modal fade" id="confirmSubmitModal" tabindex="-1" role="dialog" aria-labelledby="confirmSubmitModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmSubmitModalLabel">Apakah yakin sudah fix?</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          Apakah Anda yakin semua jawaban sudah benar?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
+          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#finalChoiceModal" data-dismiss="modal">Lanjut</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Final Choice -->
+  <div class="modal fade" id="finalChoiceModal" tabindex="-1" role="dialog" aria-labelledby="finalChoiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="finalChoiceModalLabel">Apakah akan kembali ke halaman user atau logout account?</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          Pilih tindakan yang ingin Anda lakukan setelah submit.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali ke Halaman User</button>
+          <button type="button" class="btn btn-primary" onclick="submitSurvey()">Logout</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function filterQuestions() {
+      var selectedLayanan = document.getElementById('jenis_layanan').value;
+      var questions = document.querySelectorAll('.question');
+      var counter = 1;
+      questions.forEach(function(question) {
+        if (question.getAttribute('data-layanan') === selectedLayanan || selectedLayanan === "") {
+          question.style.display = 'block';
+          question.querySelector('h2').innerText = counter + ". " + question.querySelector('h2').innerText.split('. ')[1];
+          counter++;
+        } else {
+          question.style.display = 'none';
+        }
+      });
+    }
+
+    function previousQuestion(currentQuestionId, event) {
+      event.preventDefault();
+      var currentQuestion = document.getElementById(currentQuestionId);
+      var previousQuestion = currentQuestion ? currentQuestion.previousElementSibling : null;
+      if (previousQuestion && previousQuestion.classList.contains('question')) {
+        currentQuestion.style.display = 'none';
+        previousQuestion.style.display = 'block';
+      }
+    }
+
+    function nextQuestion(currentQuestionId, event) {
+      event.preventDefault();
+      var currentQuestion = document.getElementById(currentQuestionId);
+      var nextQuestion = currentQuestion ? currentQuestion.nextElementSibling : null;
+      if (nextQuestion && nextQuestion.classList.contains('question')) {
+        currentQuestion.style.display = 'none';
+        nextQuestion.style.display = 'block';
+      }
+    }
+
+    function submitSurvey() {
+      document.getElementById('surveyForm').submit();
+    }
+  </script>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+{% endblock %}
